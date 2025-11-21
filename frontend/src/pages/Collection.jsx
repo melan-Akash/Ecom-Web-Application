@@ -12,11 +12,11 @@ const Collection = () => {
 
   const [category, setCategory] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
+  const [sort, setSort] = useState("relevant");
 
-  // Toggle Category (case-sensitive fixed)
+  // CATEGORY SELECT
   const toggleCategory = (e) => {
     const val = e.target.value;
-
     if (category.includes(val)) {
       setCategory(prev => prev.filter(item => item !== val));
     } else {
@@ -24,10 +24,9 @@ const Collection = () => {
     }
   };
 
-  // Toggle Subcategory
+  // SUB CATEGORY SELECT
   const toggleSubCategory = (e) => {
     const val = e.target.value;
-
     if (subCategory.includes(val)) {
       setSubCategory(prev => prev.filter(item => item !== val));
     } else {
@@ -35,30 +34,41 @@ const Collection = () => {
     }
   };
 
-  // Apply filters
+  // FILTER + SORT
   const applyFilter = () => {
     let copied = [...products];
 
+    // CATEGORY FILTER
     if (category.length > 0) {
       copied = copied.filter((item) => category.includes(item.category));
     }
 
+    // SUBCATEGORY FILTER
     if (subCategory.length > 0) {
       copied = copied.filter((item) => subCategory.includes(item.subCategory));
     }
 
+    // SORTING
+    if (sort === "low-high") {
+      copied.sort((a, b) => a.price - b.price);
+    }
+
+    if (sort === "high-low") {
+      copied.sort((a, b) => b.price - a.price);
+    }
+
+    // Relevant = default order (no sorting)
     setFilterProducts(copied);
   };
 
-  // Watch for filter changes
   useEffect(() => {
     applyFilter();
-  }, [category, subCategory, products]);
+  }, [category, subCategory, products, sort]);
 
   return (
     <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
 
-      {/* LEFT - FILTERS */}
+      {/* LEFT FILTERS */}
       <div className="min-w-60">
         <p
           onClick={() => setShowFilter(!showFilter)}
@@ -114,14 +124,18 @@ const Collection = () => {
         <div className="flex justify-between text-base sm:text-2xl mb-4">
           <Title text1={"All"} text2={"COLLECTION"} />
 
-          <select className="border-2 border-gray-300 text-sm px-2">
+          {/* SORT DROPDOWN */}
+          <select
+            className="border-2 border-gray-300 text-sm px-2"
+            onChange={(e) => setSort(e.target.value)}
+          >
             <option value="relevant">Sort by: Relevant</option>
             <option value="low-high">Sort by: Low-High</option>
             <option value="high-low">Sort by: High-Low</option>
           </select>
         </div>
 
-        {/* PRODUCT LIST */}
+        {/* PRODUCT GRID */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6">
           {filterProducts.map((item, index) => (
             <ProductItem
