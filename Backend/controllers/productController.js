@@ -1,57 +1,39 @@
-
-
-// // fuction for add products
-
-// const addproduct = async (req,res) =>{
-
-// } 
-
-// // fuction for list products
-
-// const listProducts = async (req,res) =>{
-
-// } 
-
-// // fuction for edite products
-
-// const editProducts = async (req,res) =>{
-
-// } 
-
-// // fuction for removing products
-
-// const removeProduct = async (req,res) =>{
-
-// } 
-
-// // fuction for single product info
-
-// const singleProduct = async (req,res) =>{
-
-// } 
-
-// export {listProducts,addproduct,removeProduct,singleProduct,editProducts}
-
-
-
 import productModel from "../models/productModel.js";
 
-// ADD PRODUCT
+// ----------------------- ADD PRODUCT -----------------------
 export const addproduct = async (req, res) => {
     try {
         const data = req.body;
 
+        // images come from multer
+        const files = req.files;
+
+        const images = [
+            files?.image1 ? files.image1[0].filename : null,
+            files?.image2 ? files.image2[0].filename : null,
+            files?.image3 ? files.image3[0].filename : null,
+            files?.image4 ? files.image4[0].filename : null
+        ].filter(Boolean);
+
+        console.log(images);
+
+        // data.image = images;
+
         const newProduct = new productModel(data);
         await newProduct.save();
 
-        res.json({ success: true, message: "Product added successfully", product: newProduct });
+        res.json({
+            success: true,
+            message: "Product added successfully",
+            product: newProduct
+        });
+
     } catch (error) {
         res.json({ success: false, message: error.message });
     }
 };
 
-
-// LIST ALL PRODUCTS
+// ----------------------- LIST ALL PRODUCTS -----------------------
 export const listProducts = async (req, res) => {
     try {
         const products = await productModel.find({});
@@ -61,8 +43,7 @@ export const listProducts = async (req, res) => {
     }
 };
 
-
-// EDIT PRODUCT
+// ----------------------- EDIT PRODUCT -----------------------
 export const editProducts = async (req, res) => {
     try {
         const { id, updateData } = req.body;
@@ -79,8 +60,7 @@ export const editProducts = async (req, res) => {
     }
 };
 
-
-// REMOVE PRODUCT
+// ----------------------- REMOVE PRODUCT -----------------------
 export const removeProduct = async (req, res) => {
     try {
         const { id } = req.body;
@@ -92,13 +72,13 @@ export const removeProduct = async (req, res) => {
         }
 
         res.json({ success: true, message: "Product removed" });
+
     } catch (error) {
         res.json({ success: false, message: error.message });
     }
 };
 
-
-// SINGLE PRODUCT INFO
+// ----------------------- SINGLE PRODUCT -----------------------
 export const singleProduct = async (req, res) => {
     try {
         const { id } = req.body;
