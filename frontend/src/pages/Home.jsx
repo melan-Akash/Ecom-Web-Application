@@ -14,7 +14,7 @@ const Home = () => {
       <BestSeller />
       <OurPolicy />
       <Newsletter />
-      <Footer />
+      
     </div>
   )
 }

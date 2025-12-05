@@ -14,6 +14,7 @@ import Product from './pages/Product'
 
 
 import { ToastContainer, toast } from 'react-toastify';
+import Footer from './components/Footer'
 
 
 const App = () => {
@@ -34,8 +35,9 @@ const App = () => {
         <Route path='/place-order' element={<PlaceOrder />} />
         <Route path='/orders' element={<Orders />} />
 
-
+      
       </Routes>
+      <Footer />
       
     </div>
   )
