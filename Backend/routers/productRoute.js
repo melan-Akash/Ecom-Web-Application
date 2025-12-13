@@ -8,6 +8,7 @@ import {
     editProducts,
     singleProduct
 } from "../controllers/productController.js";
+import adminAuth from "../middleware/adminAuth.js";
 
 const productRouter = express.Router();
 
@@ -20,10 +21,11 @@ productRouter.post("/add",
         { name: "image4", maxCount: 1 }
     ]),
     addproduct
+    ,adminAuth
 );
 
-productRouter.post("/remove", removeProduct);
-productRouter.post("/edit", editProducts);
+productRouter.post("/remove",adminAuth, removeProduct);
+productRouter.post("/edit", adminAuth, editProducts);
 productRouter.get("/list", listProducts);
 productRouter.post("/info", singleProduct);
 

@@ -1,52 +1,4 @@
-// import userModel from "../models/userModel.js";
-// import validator from "validator";
-// import bcrypt from 'bcrypt';
 
-
-// const loginUser = async (req,res) => {
-    
-// }
-
-// // route for user register
-
-// const registerUser = async (req,res) => {
-//     try {
-//         const [name,email,password] = req.body;
-//         // checking user already exite or not
-
-//         const exists = await userModel.findOne({email})
-
-//         if (exists) {
-//             return res.json({success:false, message:"User allready exists"})
-//         }
-
-//         // validating email format & strong passowrd
-
-//         if (!validator.isEmail(email)) {
-//             return res.json({success:false, message:"Please enter the valid email"})
-            
-//         }
-//         if (password.length < 8) {
-//             return res.json({success:false, message:"Please enter Strong password"})
-  
-//         }
-
-
-//     } catch (error) {
-        
-//     }
-    
-
-// }
-
-// // route for admin login
-
-// const adminLogin = async (req,res) => {
-
-
-// }
-
-// export {loginUser, registerUser, adminLogin} 
 
 import userModel from "../models/userModel.js";
 import validator from "validator";
@@ -123,17 +75,37 @@ export const loginUser = async (req, res) => {
 };
 
 
+import jwt from "jsonwebtoken";
+
 // ADMIN LOGIN
 export const adminLogin = async (req, res) => {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    // Hardcoded admin login (No JWT)
-    const ADMIN_EMAIL = "admin@gmail.com";
-    const ADMIN_PASSWORD = "admin123";
+        // Check admin credentials
+        if (
+            email === process.env.ADMIN_EMAIL &&
+            password === process.env.ADMIN_PASSWORD
+        ) {
+            // Create JWT token
+            const token = jwt.sign(
+                { admin: true, email },
+                process.env.JWT_SECRET,
+                { expiresIn: "1d" }
+            );
 
-    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
-        return res.json({ success: true, message: "Admin login success" });
+            return res.json({
+                success: true,
+                message: "Admin login success",
+                token
+            });
+        }
+
+        // If invalid credentials
+        return res.json({ success: false, message: "Invalid admin credentials" });
+
+    } catch (error) {
+        console.log(error);
+        return res.json({ success: false, message: error.message });
     }
-
-    return res.json({ success: false, message: "Invalid admin credentials" });
 };
