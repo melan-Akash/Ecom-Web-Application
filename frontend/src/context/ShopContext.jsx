@@ -125,7 +125,6 @@
 
 // export default ShopContextProvider;
 
-
 import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -146,7 +145,8 @@ const ShopContextProvider = (props) => {
 
   const clone = (obj) => JSON.parse(JSON.stringify(obj));
 
-  const addToCart = (itemId, size) => {
+  // ✅ FIX: make async
+  const addToCart = async (itemId, size) => {
     if (!size) {
       toast.error("Select product size!");
       return;
@@ -163,6 +163,20 @@ const ShopContextProvider = (props) => {
     }
 
     setCartItems(cartData);
+
+    // ✅ FIX: async API call works now
+    if (token) {
+      try {
+        await axios.post(
+          backendUrl + "/api/cart/add",
+          { itemId, size },
+          { headers: { token } }
+        );
+      } catch (error) {
+        console.log(error);
+        toast.error(error.message);
+      }
+    }
   };
 
   const getCartCount = () => {
@@ -244,3 +258,4 @@ const ShopContextProvider = (props) => {
 };
 
 export default ShopContextProvider;
+
