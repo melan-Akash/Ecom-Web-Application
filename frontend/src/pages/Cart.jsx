@@ -5,7 +5,7 @@ import { assets } from "../assets/assets";
 import CartTotal from "../components/cartTotal";
 
 const Cart = () => {
-  const { products, currency, cartItems, updateQuantity ,navigate} =
+  const { products, currency, cartItems, updateQuantity, navigate } =
     useContext(ShopContext);
 
   const [cartData, setCartData] = useState([]);
@@ -13,21 +13,23 @@ const Cart = () => {
   useEffect(() => {
     const tempData = [];
 
-    for (const itemId in cartItems) {
-      for (const size in cartItems[itemId]) {
-        if (cartItems[itemId][size] > 0) {
-          tempData.push({
-            _id: itemId,
-            size: size,
-            quantity: cartItems[itemId][size],
-          });
+    if (products.length > 0) {
+      for (const itemId in cartItems) {
+        for (const size in cartItems[itemId]) {
+          if (cartItems[itemId][size] > 0) {
+            tempData.push({
+              _id: itemId,
+              size: size,
+              quantity: cartItems[itemId][size],
+            });
+          }
         }
       }
-    }
 
-    setCartData(tempData);
-    console.log("CART DATA:", tempData);
-  }, [cartItems]);
+      setCartData(tempData);
+      console.log("CART DATA:", tempData);
+    }
+  }, [cartItems, products]);
 
   return (
     <div className="border-t pt-14">
@@ -39,8 +41,7 @@ const Cart = () => {
       <div>
         {cartData.map((item, index) => {
           const productData = products.find((p) => p._id === item._id);
-
-          if (!productData) return null; // Safety check
+          if (!productData) return null;
 
           return (
             <div
@@ -48,7 +49,7 @@ const Cart = () => {
               className="py-4 border-t border-b text-gray-700 grid 
               grid-cols-[4fr_0.5fr_0.5fr] items-center gap-4"
             >
-              {/* Left side product info */}
+              {/* Product Info */}
               <div className="flex items-start gap-6">
                 <img
                   className="w-16 sm:w-20"
@@ -72,7 +73,7 @@ const Cart = () => {
                 </div>
               </div>
 
-              {/* Quantity Input */}
+              {/* Quantity */}
               <input
                 onChange={(e) =>
                   e.target.value === "" || e.target.value === "0"
@@ -89,7 +90,7 @@ const Cart = () => {
                 defaultValue={item.quantity}
               />
 
-              {/* Delete icon */}
+              {/* Delete */}
               <img
                 onClick={() => updateQuantity(item._id, item.size, 0)}
                 className="w-4 mr-4 cursor-pointer"
@@ -101,17 +102,20 @@ const Cart = () => {
         })}
       </div>
 
-      {/* Cart Total Section */}
+      {/* Cart Total */}
       <div className="flex justify-end my-20">
         <div className="w-full sm:w-[450px]">
           <CartTotal />
           <div className="w-full text-end">
-            <button onClick={()=>navigate('/place-order')} 
-             className="bg-black text-white text-sm my-8 px-8 py-3">PROCEED TO CHECKOUT</button>
-
+            <button
+              onClick={() => navigate("/place-order")}
+              className="bg-black text-white text-sm my-8 px-8 py-3"
+            >
+              PROCEED TO CHECKOUT
+            </button>
           </div>
         </div>
-      </div> 
+      </div>
     </div>
   );
 };

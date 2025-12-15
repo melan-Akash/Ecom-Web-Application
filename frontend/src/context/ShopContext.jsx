@@ -189,11 +189,25 @@ const ShopContextProvider = (props) => {
     return total;
   };
 
-  const updateQuantity = (itemId, size, quantity) => {
-    let cartData = clone(cartItems);
-    cartData[itemId][size] = quantity;
-    setCartItems(cartData);
+  const updateQuantity = async (itemId, size, quantity) => {
+  let cartData = clone(cartItems);
+  cartData[itemId][size] = quantity;
+  setCartItems(cartData);
+
+  if (token) {
+    try {
+      await axios.post(
+        backendUrl + '/api/cart/update',
+        { itemId, size, quantity },
+        { headers: { token } }
+      );
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  }
   };
+
 
   const getCartAmount = () => {
     let total = 0;
@@ -219,18 +233,36 @@ const ShopContextProvider = (props) => {
       }
     } catch (error) {
       toast.error(error.message);
+
     }
   };
+
+  const getUserCart = async (token) =>{
+    try {
+      const response = await axios.post(backendUrl + '/api/cart/get',{},{headers:{token}})
+
+      if (response.data.success) {
+        setCartItems(response.data.cartData)
+        
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.message);
+
+      
+    }
+
+  }
 
   useEffect(() => {
     getProductsData();
   }, []);
 
-  // ✅ LOAD TOKEN ON REFRESH
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
     if (storedToken) {
       setToken(storedToken);
+      getUserCart(storedToken);
     }
   }, []);
 
