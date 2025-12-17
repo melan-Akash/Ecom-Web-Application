@@ -1,37 +1,92 @@
+import orderModel from "../models/orderModel.js";
 
+// PLACE ORDER (COD)
+const placeOrder = async (req, res) => {
+  try {
+    const userId = req.userId; // from auth middleware
+    const { items, address, amount } = req.body;
 
-// placing oreder using cod method
+    if (!items || items.length === 0) {
+      return res.json({
+        success: false,
+        message: "Cart is empty",
+      });
+    }
 
-const placeOrder = async  (req,res) => {
+    const newOrder = new orderModel({
+      userId,
+      items,
+      address,
+      amount,
+      paymentMethod: "COD",
+      payment: false,
+      date: Date.now(), // ✅ REQUIRED FIX
+    });
 
-}
+    await newOrder.save();
 
-// placing oreder using stripe method
+    res.json({
+      success: true,
+      message: "Order placed successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
 
-const placeOrderStripe = async  (req,res) => {
-    
-}
+// STRIPE (placeholder)
+const placeOrderStripe = async (req, res) => {
+  res.json({ success: false, message: "Stripe not implemented yet" });
+};
 
-// placing oreder using Razorpay method
+// RAZORPAY (placeholder)
+const placeOrderRazorpay = async (req, res) => {
+  res.json({ success: false, message: "Razorpay not implemented yet" });
+};
 
-const placeOrderRazorpay = async  (req,res) => {
-    
-}
+// ADMIN: ALL ORDERS
+const allOrders = async (req, res) => {
+  try {
+    const orders = await orderModel.find({});
+    res.json({ success: true, orders });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
 
-// all orders data for admin panala
-const allOrders = async  (req,res) => {
-    
-}
+// USER: MY ORDERS
+const userOrders = async (req, res) => {
+  try {
+    const userId = req.userId;
+    const orders = await orderModel.find({ userId });
+    res.json({ success: true, orders });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
 
-// User orders data  for frontend
-const userOrders = async  (req,res) => {
-    
-}
+// ADMIN: UPDATE STATUS
+const updateStatus = async (req, res) => {
+  try {
+    const { orderId, status } = req.body;
 
-// update order status from admin
-const updateStatus = async  (req,res) => {
+    await orderModel.findByIdAndUpdate(orderId, { status });
 
-    
-}
+    res.json({ success: true, message: "Order status updated" });
+  } catch (error) {
+    console.log(error);
+    res.json({ success: false, message: error.message });
+  }
+};
 
-export {placeOrder,placeOrderRazorpay,placeOrderStripe,allOrders,userOrders,updateStatus} 
+export {
+  placeOrder,
+  placeOrderRazorpay,
+  placeOrderStripe,
+  allOrders,
+  userOrders,
+  updateStatus,
+};
